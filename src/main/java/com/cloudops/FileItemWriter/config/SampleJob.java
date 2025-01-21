@@ -16,7 +16,8 @@ import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
-import org.springframework.batch.item.file.transform.FieldExtractor;
+import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
+import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,7 +65,8 @@ public class SampleJob {
                 .<StudentJdbc, StudentJdbc>chunk(3,platformTransactionManager)
                 .reader(jdbcJdbcCursorItemReader())
                 //.processor(firstItemProcessor)
-                .writer(flatFileItemWriter())
+                //.writer(flatFileItemWriter())
+                .writer(jsonFileItemWriter())
                 .build();
     }
 
@@ -104,5 +106,11 @@ public class SampleJob {
             }
         });
         return fileItemWriter;
+    }
+
+    public JsonFileItemWriter<StudentJdbc> jsonFileItemWriter(){
+        FileSystemResource fileSystemResource = new FileSystemResource(new File("D:\\Spring Projects\\Spring Batch Projects\\FileItemWriter\\src\\main\\java\\input\\student.json"));
+        JsonFileItemWriter<StudentJdbc> jsonFileWriter = new JsonFileItemWriter<>(fileSystemResource,new JacksonJsonObjectMarshaller<StudentJdbc>());
+        return jsonFileWriter;
     }
 }
